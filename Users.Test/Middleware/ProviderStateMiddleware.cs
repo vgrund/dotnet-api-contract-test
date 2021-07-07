@@ -6,24 +6,28 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
+using Moq;
 using Newtonsoft.Json;
+using NSubstitute;
 using Users.Repository;
 
 namespace Users.Test.Middleware
 {
     public class ProviderStateMiddleware
     {
-        private const string ConsumerName = "User API - Release 1.0.0";
+        private const string ConsumerName = "API Users v1 - Release v1.0";
         private readonly RequestDelegate _next;
         private readonly IDictionary<string, Action> _providerStates;
+        private readonly UsersRepository _usersRepository;
 
         public ProviderStateMiddleware(RequestDelegate next)
         {
+            _usersRepository = new UsersRepository();
             _next = next;
             _providerStates = new Dictionary<string, Action>
             {
                 {
-                    "getByIdUsers-404",
+                    "GetByIdUsers-404",
                     RemoveAllData
                 }
             };
@@ -31,19 +35,16 @@ namespace Users.Test.Middleware
 
         private void RemoveAllData()
         {
-            Moq.Mock<UsersRepository> mock = new Moq.Mock<UsersRepository>();
-            mock.Setup(r => r.GetById(Guid.NewGuid())).Returns((User)null);
-        }
-
-        private void AddData()
-        {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), @"../../../../../data");
-            var writePath = Path.Combine(path, "somedata.txt");
-
-            if (!File.Exists(writePath))
+            _usersRepository.Users = new List<User>(2)
             {
-                File.Create(writePath);
-            }
+                new User(){
+                    Id = new Guid("ba8e6bc0-f02d-4f71-98cf-6f63b52434e0"),
+                    FirstName = "John",
+                    LastName = "Lennon",
+                    Email = "jl@email.com",
+                    Phone = "9999999999"
+                }
+            };
         }
 
         public async Task Invoke(HttpContext context)
@@ -78,7 +79,11 @@ namespace Users.Test.Middleware
                 if (providerState != null && !String.IsNullOrEmpty(providerState.State) &&
                     providerState.Consumer == ConsumerName)
                 {
-                    _providerStates[providerState.State].Invoke();
+                    _providerStates.TryGetValue(providerState.State, out Action action);
+                    if(action != null)
+                    {
+                        action.Invoke();
+                    }
                 }
             }
         }

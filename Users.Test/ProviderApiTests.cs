@@ -7,6 +7,7 @@ using PactNet.Infrastructure.Outputters;
 using Xunit;
 using Xunit.Abstractions;
 using Users.Test.XUnitHelpers;
+using Microsoft.AspNetCore.TestHost;
 
 namespace Users.Test
 {
@@ -16,19 +17,24 @@ namespace Users.Test
         private string _pactServiceUri { get; }
         private IWebHost _webHost { get; }
         private ITestOutputHelper _outputHelper { get; }
+        private TestServer _server { get; set; }
 
         public ProviderApiTests(ITestOutputHelper output)
         {
             _outputHelper = output;
             _providerUri = "http://localhost:9000";
-            _pactServiceUri = "http://localhost:9001";
+            _pactServiceUri = "http://localhost:9002";
 
             _webHost = WebHost.CreateDefaultBuilder()
-                .UseUrls(_pactServiceUri)
+                .UseUrls(_providerUri)
                 .UseStartup<ApiStartup>()
                 .Build();
 
             _webHost.Start();
+
+            //_server = new TestServer(new WebHostBuilder()
+            //    .UseUrls(_providerUri)
+            //    .UseStartup<ApiStartup>());
         }
 
         [Fact]
@@ -43,7 +49,8 @@ namespace Users.Test
                 // so a custom outputter is required.
                 Outputters = new List<IOutput>
                                 {
-                                    new XUnitOutput(_outputHelper)
+                                   new XUnitOutput(_outputHelper)
+                                    //new ConsoleOutput()
                                 },
 
                 // Output verbose verification logs to the test output
@@ -54,12 +61,18 @@ namespace Users.Test
 
             IPactVerifier pactVerifier = new PactVerifier(config);
             pactVerifier
-                .ProviderState($"{_pactServiceUri}/provider-states")
+                .ProviderState($"{_providerUri}/provider-states")
                 .ServiceProvider("API Users v1", _providerUri)
-                // .HonoursPactWith("User API - Release 1.0.0")
-                .PactUri("http://pact-maestro.ipet.sh/pacts/provider/API%20Users%20v1/consumer/API%20Users%20v1%20-%20Release%20v1.0/latest")
-                .Verify();
+            //    //.HonoursPactWith("API Users v1 - Release v1.0")
+                .PactUri("http://pact-maestro.ipet.sh/pacts/provider/API%20Users%20v1/consumer/API%20Users%20v1%20-%20Release%20v1.0/latest");
+            //    .Verify();
 
+            //pactVerifier
+            //    .PactBroker("http://pact-maestro.ipet.sh/pacts/provider/API%20Users%20v1/consumer/API%20Users%20v1%20-%20Release%20v1.0/latest",
+            //        consumerVersionTags: new List<string> { "test" }
+            //        );
+
+            pactVerifier.Verify();
             // Assert.True(true);
         }
 

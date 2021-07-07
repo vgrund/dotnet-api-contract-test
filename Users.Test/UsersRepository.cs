@@ -1,16 +1,19 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Users.Repository;
 
-namespace Users.Repository
+namespace Users.Test
 {
     public class UsersRepository : IUsersRepository
     {
-        protected List<User> users;
+        public List<User> Users { get; set; }
 
         public UsersRepository()
         {
-            users = new List<User>(2){
+            Users = new List<User>(2){
                 new User(){
                     Id = new Guid("ba8e6bc0-f02d-4f71-98cf-6f63b52434e0"),
                     FirstName = "John",
@@ -30,12 +33,12 @@ namespace Users.Repository
 
         public List<User> GetAll()
         {
-            return users;
+            return Users;
         }
 
         public User GetById(Guid id)
         {
-            return users.Where(u => u.Id == id).FirstOrDefault();
+            return Users.Where(u => u.Id == id).FirstOrDefault();
         }
     }
 }

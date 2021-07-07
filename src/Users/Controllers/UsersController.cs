@@ -18,12 +18,12 @@ namespace Users.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ILogger<UsersController> _logger;
-        private readonly UsersRepository _repository;
+        private readonly IUsersRepository _repository;
 
-        public UsersController(ILogger<UsersController> logger)
+        public UsersController(ILogger<UsersController> logger, IUsersRepository usersRepository)
         {
             _logger = logger;
-            _repository = new UsersRepository();
+            _repository = usersRepository;
         }
 
         [HttpGet]

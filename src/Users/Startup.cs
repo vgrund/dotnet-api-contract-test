@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Users.Repository;
 
 namespace Users
 {
@@ -29,6 +30,8 @@ namespace Users
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IUsersRepository, UsersRepository>();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -72,8 +75,6 @@ namespace Users
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Users v1"));
 
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
