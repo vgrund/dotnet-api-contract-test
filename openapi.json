@@ -1,0 +1,206 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API Users v1",
+    "description": "API REST Users - Feita em ASP.NET Core 5 para gerenciamento de usuários",
+    "contact": {
+      "name": "Squad X",
+      "url": "https://gitlab.luizalabs.com/luizalabs/"
+    },
+    "version": "v1.0"
+  },
+  "paths": {
+    "/Users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtêm todos os users",
+        "description": "Este recurso lista todos os users cadastrados",
+        "operationId": "GetAllUsers",
+        "responses": {
+          "200": {
+            "description": "The list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Users"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Cria um user",
+        "description": "Este recurso cria um user",
+        "operationId": "CreateUsers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "An user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Users/{userId}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtêm um user pelo seu Id",
+        "description": "Este recurso apresenta o user",
+        "operationId": "GetByIdUsers",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User Id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "ba8e6bc0-f02d-4f71-98cf-6f63b52434e0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "example": {
+          "type": "ba8e6bc0-f02d-4f71-98cf-6f63b52434e0",
+          "title": "John",
+          "status": 123,
+          "detail": "jl@email.com",
+          "instance": "9999999999"
+        },
+        "additionalProperties": { }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "example": {
+          "id": "ba8e6bc0-f02d-4f71-98cf-6f63b52434e0",
+          "firstName": "John",
+          "lastName": "Lennon",
+          "email": "jl@email.com",
+          "phone": "9999999999"
+        },
+        "additionalProperties": false,
+        "description": "The name of the product"
+      },
+      "Users": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "nullable": true
+          }
+        },
+        "example": {
+          "users": [
+            {
+              "id": "ba8e6bc0-f02d-4f71-98cf-6f63b52434e0",
+              "firstName": "John",
+              "lastName": "Lennon",
+              "email": "jl@email.com",
+              "phone": "9999999999"
+            }
+          ]
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
