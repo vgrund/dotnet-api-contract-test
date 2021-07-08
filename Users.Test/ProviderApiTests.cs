@@ -63,6 +63,7 @@ namespace Users.Test
             pactVerifier
                 .ProviderState($"{_providerUri}/provider-states")
                 .ServiceProvider("API Users v1", _providerUri)
+                //.PactUri("http://pact-maestro.ipet.sh/pacts/provider/API%20Users%20v1/consumer/API%20Users%20v1%20-%20Release%20v1.0/latest");
                 .PactBroker("http://pact-maestro.ipet.sh");
 
             pactVerifier.Verify();
