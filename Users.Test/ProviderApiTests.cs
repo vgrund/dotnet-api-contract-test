@@ -23,7 +23,7 @@ namespace Users.Test
         {
             _outputHelper = output;
             _providerUri = "http://localhost:9000";
-            _pactServiceUri = "http://localhost:9002";
+            _pactServiceUri = "http://localhost:9001";
 
             _webHost = WebHost.CreateDefaultBuilder()
                 .UseUrls(_providerUri)
@@ -63,17 +63,9 @@ namespace Users.Test
             pactVerifier
                 .ProviderState($"{_providerUri}/provider-states")
                 .ServiceProvider("API Users v1", _providerUri)
-            //    //.HonoursPactWith("API Users v1 - Release v1.0")
-                .PactUri("http://pact-maestro.ipet.sh/pacts/provider/API%20Users%20v1/consumer/API%20Users%20v1%20-%20Release%20v1.0/latest");
-            //    .Verify();
-
-            //pactVerifier
-            //    .PactBroker("http://pact-maestro.ipet.sh/pacts/provider/API%20Users%20v1/consumer/API%20Users%20v1%20-%20Release%20v1.0/latest",
-            //        consumerVersionTags: new List<string> { "test" }
-            //        );
+                .PactBroker("http://pact-maestro.ipet.sh");
 
             pactVerifier.Verify();
-            // Assert.True(true);
         }
 
         #region IDisposable Support

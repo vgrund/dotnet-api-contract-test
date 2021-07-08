@@ -13,6 +13,7 @@ namespace Users.Test
 
         public UsersRepository()
         {
+            //Users = new List<User>();
             Users = new List<User>(2){
                 new User(){
                     Id = new Guid("ba8e6bc0-f02d-4f71-98cf-6f63b52434e0"),
@@ -38,6 +39,7 @@ namespace Users.Test
 
         public User GetById(Guid id)
         {
+            //return null;
             return Users.Where(u => u.Id == id).FirstOrDefault();
         }
     }

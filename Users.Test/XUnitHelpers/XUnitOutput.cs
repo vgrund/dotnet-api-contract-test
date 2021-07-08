@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using PactNet.Infrastructure.Outputters;
 using Xunit.Abstractions;
 
@@ -17,6 +18,8 @@ namespace Users.Test.XUnitHelpers
         {
             _output.WriteLine(line);
             Console.WriteLine(line);
+            using StreamWriter file = new("WriteLines1.txt", append: true);
+            file.WriteLine(line);
         }
     }
 }

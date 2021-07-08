@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using Users.Repository;
+using System.IO;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace Users.Controllers
 {
@@ -53,6 +56,11 @@ namespace Users.Controllers
         public ActionResult GetById(Guid userId)
         {
             var user = _repository.GetById(userId);
+            using StreamWriter file = new("WriteLines2.txt", append: true);
+            file.WriteLine(JsonSerializer.Serialize(user));
+
+            //return null;
+            //return Ok(user);
             return user == null ? NotFound() : Ok(user);
         }
 
