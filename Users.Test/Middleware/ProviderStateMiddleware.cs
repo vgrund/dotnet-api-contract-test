@@ -46,23 +46,23 @@ namespace Users.Test.Middleware
             //    Phone = "9999999999"
             //});
 
-            //_usersRepository.Users.Clear();
-            ////((UsersRepository)_usersRepository).Users = new List<User>(2){
-            ////    new User(){
-            ////        Id = new Guid("ba8e6bc0-f02d-4f71-98cf-6f63b52434e0"),
-            ////        FirstName = "John",
-            ////        LastName = "Lennon",
-            ////        Email = "jl@email.com",
-            ////        Phone = "9999999999"
-            ////    },
-            ////    new User(){
-            ////        Id = new Guid("ee4a8bd0-4792-472b-87a4-228ec2db84e0"),
-            ////        FirstName = "Paul",
-            ////        LastName = "McCartney",
-            ////        Email = "pm@email.com",
-            ////        Phone = "9999999999"
-            ////    }
-            ////};
+            ((FakeUsersRepository)_usersRepository).Users.Clear();
+            //((UsersRepository)_usersRepository).Users = new List<User>(2){
+            //    new User(){
+            //        Id = new Guid("ba8e6bc0-f02d-4f71-98cf-6f63b52434e0"),
+            //        FirstName = "John",
+            //        LastName = "Lennon",
+            //        Email = "jl@email.com",
+            //        Phone = "9999999999"
+            //    },
+            //    new User(){
+            //        Id = new Guid("ee4a8bd0-4792-472b-87a4-228ec2db84e0"),
+            //        FirstName = "Paul",
+            //        LastName = "McCartney",
+            //        Email = "pm@email.com",
+            //        Phone = "9999999999"
+            //    }
+            //};
         }
 
         public async Task Invoke(HttpContext context)

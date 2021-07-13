@@ -7,36 +7,63 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Users.Repository;
 using Users.Test.Middleware;
+using Api = Users;
 
 namespace Users.Test
 {
     public class ApiStartup { 
-    public ApiStartup(IConfiguration configuration)
+    public ApiStartup(IConfiguration configuration, IUsersRepository usersRepository)
     {
+        _usersRepository = usersRepository;
         Configuration = configuration;
-        Startup = new Startup(Configuration);
+        Startup = new Api.Startup(Configuration);
     }
 
     public IConfiguration Configuration { get; }
-    public Startup Startup { get; }
+    public Api.Startup Startup { get; }
+    private readonly IUsersRepository _usersRepository;
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSingleton<IUsersRepository, UsersRepository>();
         Startup.ConfigureServices(services);
-        //services.AddSingleton<IUsersRepository, UsersRepository>();
-    }
+            //((UsersRepository)_usersRepository).Users 
+            //var repo = new UsersRepository();
+            //repo.Users = new List<User>(2){
+            //    new User(){
+            //        Id = new Guid("ba8e6bc0-f02d-4f71-98cf-6f63b52434e0"),
+            //        FirstName = "John",
+            //        LastName = "Lennon",
+            //        Email = "jl@email.com",
+            //        Phone = "9999999999"
+            //    },
+            //    new User(){
+            //        Id = new Guid("ee4a8bd0-4792-472b-87a4-228ec2db84e0"),
+            //        FirstName = "Paul",
+            //        LastName = "McCartney",
+            //        Email = "pm@email.com",
+            //        Phone = "9999999999"
+            //    }
+            //};
+            services.AddSingleton<IUsersRepository>(s => _usersRepository);
+            //services.AddSingleton<IUsersRepository, UsersRepository>();
+            var assembly = Assembly.Load("Users");
+
+            services.AddMvc().AddApplicationPart(assembly);
+        }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        app.UseMiddleware<ProviderStateMiddleware>();
+            
+            //app.UseMiddleware<FlagMiddleware>();
 
-        Startup.Configure(app, env);
-    }
+            Startup.Configure(app, env);
+            app.UseMiddleware<ProviderStateMiddleware>();
+        }
 }
 
         //public class ApiStartup

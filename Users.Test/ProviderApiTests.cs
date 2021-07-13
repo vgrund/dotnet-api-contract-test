@@ -8,38 +8,115 @@ using Xunit;
 using Xunit.Abstractions;
 using Users.Test.XUnitHelpers;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Users.Repository;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using Api = Users;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Users.Test
 {
     public class ProviderApiTests : IDisposable
     {
         private string _providerUri { get; }
-        private string _pactServiceUri { get; }
+        //private string _pactServiceUri { get; }
         private IWebHost _webHost { get; }
         private ITestOutputHelper _outputHelper { get; }
         private TestServer _server { get; set; }
+        private IConfiguration Configuration { get; }
+        //private readonly WebApplicationFactory<Startup> _factory;
+        private readonly IUsersRepository _usersRepository;
 
-        public ProviderApiTests(ITestOutputHelper output)
+        public ProviderApiTests(ITestOutputHelper output, IUsersRepository usersRepository, IConfiguration configuration)
         {
+            Configuration = configuration;
+            _usersRepository = usersRepository;
             _outputHelper = output;
             _providerUri = "http://localhost:9000";
-            _pactServiceUri = "http://localhost:9001";
+            //_pactServiceUri = "http://localhost:9001";
 
-            _webHost = WebHost.CreateDefaultBuilder()
-                .UseUrls(_providerUri)
-                .UseStartup<ApiStartup>()
-                .Build();
 
-            _webHost.Start();
 
-            //_server = new TestServer(new WebHostBuilder()
-            //    .UseUrls(_providerUri)
-            //    .UseStartup<ApiStartup>());
+            //var webHost = WebHost.CreateDefaultBuilder()
+            //    .UseUrls("http://*:9000;http://*:9001")
+            //    .UseStartup<ApiStartup>(s => new ApiStartup(configuration, usersRepository));
+            //    .Build();
+
+            //_webHost.Start();
+
+            //_server = new TestServer(webHost);
+
+            //_factory = factory;
+
+            StartAsync();
         }
 
-        [Fact]
-        public void EnsureProviderApiHonoursPactWithConsumer()
+        private async void StartAsync(CancellationToken cancellationToken = default)
         {
+            await CreateHostBuilder().Build().StartAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        //public static void Run()
+        //{
+        //    string[] args = { "" };
+        //    CreateHostBuilder(args).Build().RunAsync();
+        //}
+
+        //public static IHostBuilder CreateHostBuilder(string[] args) =>
+        //    Host.CreateDefaultBuilder(args)
+        //        .ConfigureWebHostDefaults(webBuilder =>
+        //        {
+        //            webBuilder.UseUrls("http://localhost:9000");
+        //            webBuilder.UseStartup<Startup>();
+        //        });
+
+        public IHostBuilder CreateHostBuilder() =>
+            Host.CreateDefaultBuilder()
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseUrls("http://localhost:9000");
+                    //webBuilder.UseStartup<Api.Startup>();
+                    //webBuilder.ConfigureAppConfiguration((hostingContext, config) =>
+                    //{
+                    //    config.AddJsonFile
+                    //});
+                    //webBuilder.UseStartup<ApiStartup>();
+                    webBuilder.UseStartup<ApiStartup>(s => new ApiStartup(Configuration, _usersRepository));
+                });
+
+        [Fact]
+        public async void EnsureProviderApiHonoursPactWithConsumer()
+        {
+           // var hostBuilder = new HostBuilder()
+           //.ConfigureWebHost(webHost =>
+           //{
+           //     // Add TestServer
+           //     webHost
+           //         .UseUrls(_providerUri)
+           //         .UseTestServer()
+           //         .UseStartup<ApiStartup>(s => new ApiStartup(Configuration, _usersRepository));
+                    
+           //     //webHost.Configure(app => app.Run(async ctx =>
+           //     //    await ctx.Response.WriteAsync("Hello World!")));
+           // });
+
+           // var host = hostBuilder.Build();
+           // await host.StartAsync();
+
+            //Host.CreateDefaultBuilder()
+            //    .ConfigureWebHostDefaults(webBuilder =>
+            //    {
+            //        webBuilder.UseUrls(_providerUri);
+            //        webBuilder.UseStartup<Startup>();
+            //    });
+
+            
+
+            // Build and start the IHost
+            //var host = await hostBuilder.StartAsync();
+
             // Arrange
             var config = new PactVerifierConfig
             {
@@ -78,8 +155,8 @@ namespace Users.Test
             {
                 if (disposing)
                 {
-                    _webHost.StopAsync().GetAwaiter().GetResult();
-                    _webHost.Dispose();
+                    //_webHost.StopAsync().GetAwaiter().GetResult();
+                    //_webHost.Dispose();
                 }
 
                 disposedValue = true;
