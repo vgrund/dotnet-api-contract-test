@@ -8,39 +8,49 @@ using Xunit;
 using Xunit.Abstractions;
 using Users.Test.XUnitHelpers;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Users.Repository;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using Api = Users;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Users.Test
 {
     public class ProviderApiTests : IDisposable
     {
         private string _providerUri { get; }
-        private string _pactServiceUri { get; }
-        private IWebHost _webHost { get; }
         private ITestOutputHelper _outputHelper { get; }
-        private TestServer _server { get; set; }
+        private IConfiguration Configuration { get; }
+        private readonly IUsersRepository _usersRepository;
 
-        public ProviderApiTests(ITestOutputHelper output)
+        public ProviderApiTests(ITestOutputHelper output, IUsersRepository usersRepository, IConfiguration configuration)
         {
+            Configuration = configuration;
+            _usersRepository = usersRepository;
             _outputHelper = output;
             _providerUri = "http://localhost:9000";
-            _pactServiceUri = "http://localhost:9001";
 
-            _webHost = WebHost.CreateDefaultBuilder()
-                .UseUrls(_providerUri)
-                .UseStartup<ApiStartup>()
-                .Build();
-
-            _webHost.Start();
-
-            //_server = new TestServer(new WebHostBuilder()
-            //    .UseUrls(_providerUri)
-            //    .UseStartup<ApiStartup>());
+            StartAsync();
         }
 
-        [Fact]
-        public void EnsureProviderApiHonoursPactWithConsumer()
+        private async void StartAsync(CancellationToken cancellationToken = default)
         {
-            // Arrange
+            await CreateHostBuilder().Build().StartAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        public IHostBuilder CreateHostBuilder() =>
+            Host.CreateDefaultBuilder()
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseUrls("http://localhost:9000");
+                    webBuilder.UseStartup<ApiStartup>(s => new ApiStartup(Configuration, _usersRepository));
+                });
+
+        [Fact]
+        public async void EnsureProviderApiHonoursPactWithConsumer()
+        {
             var config = new PactVerifierConfig
             {
 
@@ -50,7 +60,6 @@ namespace Users.Test
                 Outputters = new List<IOutput>
                                 {
                                    new XUnitOutput(_outputHelper)
-                                    //new ConsoleOutput()
                                 },
 
                 // Output verbose verification logs to the test output
@@ -63,7 +72,6 @@ namespace Users.Test
             pactVerifier
                 .ProviderState($"{_providerUri}/provider-states")
                 .ServiceProvider("API Users v1", _providerUri)
-                //.PactUri("http://pact-maestro.ipet.sh/pacts/provider/API%20Users%20v1/consumer/API%20Users%20v1%20-%20Release%20v1.0/latest");
                 .PactBroker("http://pact-maestro.ipet.sh");
 
             pactVerifier.Verify();
@@ -78,8 +86,7 @@ namespace Users.Test
             {
                 if (disposing)
                 {
-                    _webHost.StopAsync().GetAwaiter().GetResult();
-                    _webHost.Dispose();
+
                 }
 
                 disposedValue = true;
