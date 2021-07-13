@@ -6,9 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
-using Moq;
 using Newtonsoft.Json;
-using NSubstitute;
 using Users.Repository;
 
 namespace Users.Test.Middleware
@@ -22,7 +20,6 @@ namespace Users.Test.Middleware
 
         public ProviderStateMiddleware(RequestDelegate next, IUsersRepository usersrepository)
         {
-            //_usersRepository = new UsersRepository();
             _usersRepository = usersrepository;
             _next = next;
             _providerStates = new Dictionary<string, Action>
@@ -36,33 +33,7 @@ namespace Users.Test.Middleware
 
         private void RemoveAllData()
         {
-            //var mock = new Mock<IUsersRepository>();
-            //mock.Setup(s => s.GetById(Guid.NewGuid())).Returns(new User()
-            //{
-            //    Id = new Guid("ba8e6bc0-f02d-4f71-98cf-6f63b52434e0"),
-            //    FirstName = "John",
-            //    LastName = "Lennon",
-            //    Email = "jl@email.com",
-            //    Phone = "9999999999"
-            //});
-
-            //_usersRepository.Users.Clear();
-            ////((UsersRepository)_usersRepository).Users = new List<User>(2){
-            ////    new User(){
-            ////        Id = new Guid("ba8e6bc0-f02d-4f71-98cf-6f63b52434e0"),
-            ////        FirstName = "John",
-            ////        LastName = "Lennon",
-            ////        Email = "jl@email.com",
-            ////        Phone = "9999999999"
-            ////    },
-            ////    new User(){
-            ////        Id = new Guid("ee4a8bd0-4792-472b-87a4-228ec2db84e0"),
-            ////        FirstName = "Paul",
-            ////        LastName = "McCartney",
-            ////        Email = "pm@email.com",
-            ////        Phone = "9999999999"
-            ////    }
-            ////};
+            ((FakeUsersRepository)_usersRepository).Users.Clear();
         }
 
         public async Task Invoke(HttpContext context)

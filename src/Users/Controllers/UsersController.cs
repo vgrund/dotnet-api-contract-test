@@ -59,8 +59,6 @@ namespace Users.Controllers
             using StreamWriter file = new("WriteLines2.txt", append: true);
             file.WriteLine(JsonSerializer.Serialize(user));
 
-            //return null;
-            //return Ok(user);
             return user == null ? NotFound() : Ok(user);
         }
 
